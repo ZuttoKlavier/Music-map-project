@@ -6,10 +6,12 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
+    body { font-family: "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif; }
     #map { height: 100vh; width: 100%; margin: 0; padding: 0; }
-    .popup-content { text-align: center; font-family: sans-serif; }
+    .popup-content { text-align: center; font-family: "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif; }
     .popup-content h3 { margin: 0 0 8px 0; color: #333; }
     .popup-content p { margin: 0 0 12px 0; font-size: 14px; color: #666; }
+    .popup-content img { display: block; width: 220px; max-height: 180px; object-fit: cover; margin: 0 auto 12px; border-radius: 6px; }
     audio { width: 220px; outline: none; }
   </style>
 </head>
@@ -20,8 +22,8 @@
   <script>
     const map = L.map('map').setView([23.5, 117.5], 6);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+    L.tileLayer('https://webrd03.is.autonavi.com/appmaptile?style=8&x={x}&y={y}&z={z}&lang=zh_cn', {
+      attribution: '© 高德地图'
     }).addTo(map);
 
     // 音樂地理資料庫：請在此大括號陣列中擴充你的收集
@@ -32,7 +34,8 @@
         description: "娓婉悦耳的江南水乡苏州评弹小调！",
         lat: 31.490412,
         lng: 120.299965,
-        audioUrl: "./assets/Wuxi.mp3" 
+        audioUrl: "./assets/Wuxi.mp3",
+        imageUrl: "./assets/WuxiFoto.jpeg"
       },
       {
         id: "Jiangsu-02",
@@ -40,7 +43,8 @@
         description: "相传是清代乾隆皇帝南巡时，江南民间艺人创作的民歌，旋律优美，歌词生动。",
         lat: 32.418371,
         lng: 119.424531,
-        audioUrl: "./assets/Yangzhou.mp3" 
+        audioUrl: "./assets/Yangzhou.mp3",
+        imageUrl: "./assets/YangzhouFoto.jpeg"
       },
       {
         id: "Yunnan-01",
@@ -48,15 +52,17 @@
         description: "弥渡山歌是一首云南民歌，反映了南来北往的马帮带来思乡吟唱",
         lat: 25.305126,
         lng: 100.503088,
-        audioUrl: "./assets/Midu.mp3" 
+        audioUrl: "./assets/Midu.mp3",
+        imageUrl: "./assets/MiduFoto.jpeg"
       },
       {
         id: "Jiangsu-03",
-        title: "盐城民歌",
+        title: "淮剧唱段",
         description: "盐城民歌淮剧唱段，旋律优美，歌词生动。",
         lat: 32.955781,
         lng: 120.487858,
-        audioUrl: "./assets/Yancheng.mp3" 
+        audioUrl: "./assets/Yancheng.mp3",
+        imageUrl: "./assets/YanchengFoto.jpeg"
       },
       {
         id: "Jiangsu-04",
@@ -64,7 +70,8 @@
         description: "苏州评弹是江苏苏州地区的传统曲艺形式，以其优美的旋律和生动的歌词著称。",
         lat: 31.304667,
         lng: 120.585333,
-        audioUrl: "./assets/Suzhou.mp3" 
+        audioUrl: "./assets/Suzhou.mp3",
+        imageUrl: "./assets/SuzhouFoto.jpeg"
       },
     ];
 
@@ -73,6 +80,7 @@
         <div class="popup-content">
           <h3>${item.title}</h3>
           <p>${item.description}</p>
+          ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}">` : ''}
           <audio controls controlsList="nodownload">
             <source src="${item.audioUrl}">
             你的瀏覽器不支援音訊播放。
@@ -81,6 +89,14 @@
       `;
       L.marker([item.lat, item.lng]).addTo(map).bindPopup(popupHTML);
     });
+
+    // play 事件不會冒泡，使用捕獲階段監聽動態建立的彈窗音訊。
+    document.addEventListener('play', event => {
+      if (!(event.target instanceof HTMLAudioElement)) return;
+      document.querySelectorAll('audio').forEach(audio => {
+        if (audio !== event.target && !audio.paused) audio.pause();
+      });
+    }, true);
   </script>
 </body>
 </html>
